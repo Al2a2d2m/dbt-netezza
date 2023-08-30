@@ -140,11 +140,20 @@ class NetezzaConnectionManager(connection_cls):
         that has items such as code, rows_affected, etc. can also just be a string ex. "OK"
         if your cursor does not offer rich metadata.
         """
-        if not len(cursor.messages):
-            return "OK"
-        last_code, last_message = cursor.messages[-1]
-        return AdapterResponse(last_message, last_code, cursor.rowcount)
+		# TODO Implement if odbc cursor provides status
+        code = "ok"
+        num_rows = -1
 
+        if cursor is not None and cursor.rowcount is not None:
+            num_rows = cursor.rowcount
+
+        return AdapterResponse(
+            _message="{}".format(code),
+            rows_affected=num_rows,
+            code=code
+        )
+		
+        
     def cancel(self, connection):
         """
         Gets a connection object and attempts to cancel any ongoing queries.
